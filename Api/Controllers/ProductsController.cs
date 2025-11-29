@@ -32,7 +32,8 @@ namespace Api.Controllers
         }
 
         [HttpGet("{id}")]
-		public async Task<IActionResult> Get(int id)
+        [AllowAnonymous]
+        public async Task<IActionResult> Get(int id)
 		{
 			var product = await _service.GetProductAsync(id);
 			return Ok(BaseResponseDTO<ProductResponse>.SuccessResponse(product!, null,"Get detail product successfully"));
