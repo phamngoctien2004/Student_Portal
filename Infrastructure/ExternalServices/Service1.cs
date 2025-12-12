@@ -15,7 +15,7 @@ namespace Infrastructure.ExternalServices
 			_logger = logger;
 		}
 
-		public async Task<List<Product>> GetAllProducts()
+		public async Task<List<Course>> GetAllProducts()
 		{
 			try
 			{
@@ -33,7 +33,7 @@ namespace Infrastructure.ExternalServices
 					response.EnsureSuccessStatusCode();
 
 					var content = await response.Content.ReadAsStringAsync();
-					var result = JsonConvert.DeserializeObject<BaseResponseDTO<List<Product>>>(content);
+					var result = JsonConvert.DeserializeObject<BaseResponseDTO<List<Course>>>(content);
 
 					return result?.Data;
 				}

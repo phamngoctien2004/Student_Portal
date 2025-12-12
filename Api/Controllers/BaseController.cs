@@ -13,7 +13,7 @@ namespace Api.Controllers
 			{
 				var data = await task;
 
-				return BaseResponseDTO<T>.SuccessResponse(data);
+				return BaseResponseDTO<T>.SuccessResponse(data, null, null);
 			}
 			catch (ApplicationException ex)
 			{

@@ -1,7 +1,5 @@
 ﻿using Application.DTOs.Common;
-using Application.DTOs.Request.Auth;
-using Application.DTOs.Request.Upload;
-using Application.DTOs.Response.Auth;
+using Application.DTOs.Upload;
 using Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,8 +27,8 @@ namespace Api.Controllers
                     FileStream = file.OpenReadStream(),
                     Length = file.Length
                 };
-                var path = await _uploadService.Upload(uploadReq);
-                return Ok(BaseResponseDTO<string>.SuccessResponse(path, null, "Upload file successfully"));
+                var path = await _uploadService.Upload(uploadReq, "avatar");
+                return Ok(BaseResponseDTO<string>.SuccessResponse(path, "Upload file successfully"));
             }
             return BadRequest();
         }

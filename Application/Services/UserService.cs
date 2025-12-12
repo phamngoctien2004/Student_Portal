@@ -1,11 +1,14 @@
-﻿using Application.DTOs.Request.User;
-using Application.DTOs.Response.User;
+﻿using Application.DTOs.Common;
+using Application.DTOs.User;
+using Application.Exceptions;
+using Application.IRepositories;
 using Application.IRepository;
 using Application.IServices;
 using Application.Mappers;
 using AutoMapper;
 using BCrypt.Net;
 using Core.Entities;
+using Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,32 +19,109 @@ namespace Application.Services
 {
     public class UserService : IUserService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public UserService(IUserRepository UserRepository, IMapper mapper)
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _userRepository = UserRepository;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
+        public async Task<BaseResponseDTO<List<UserResponse>>> GetAll(UserParams param)
+        {
+           
+            var result = await _unitOfWork.Users.GetAllAsync(param);
+            var users = result.Item1;
+            var count = result.Item2;
 
-        public async Task<User> AddUser(User user)
-        {
-            if (!string.IsNullOrWhiteSpace(user.Password))
+            var metaData = new MetaDataDTO
             {
-                var passwordHashed = BCrypt.Net.BCrypt.HashPassword(user.Password);
-                user.Password = passwordHashed;
-            }
-            return await _userRepository.AddAsync(user);
+                Page = param.Page,
+                PageSize = param.PageSize,
+                Total = count
+            };
+            return BaseResponseDTO<List<UserResponse>>.SuccessResponse(
+                    _mapper.Map<List<UserResponse>>(users),
+                    metaData,
+                    "Get products successfully"
+            );
         }
-        public async Task<User> AddUser(AddUserReq userRequest)
+
+        public async Task<User?> GetEntityByEmail(string email)
         {
-            var user = _mapper.Map<User>(userRequest);
-            return await AddUser(user);
-        }
-        public async Task<User> GetByEmail(string email)
-        {
-            var user = await _userRepository.GetByEmail(email);
+            var user = await _unitOfWork.Users.GetByEmail(email);
             return user;
+        }
+
+        public async Task<UserResponse?> GetById(int id)
+        {
+            var user = await _unitOfWork.Users.GetByIdAsync(id);
+            return _mapper.Map<UserResponse>(user);
+        }
+
+        public async Task<UserResponse> Add(UserRequest req)
+        {
+            var user = await _unitOfWork.Users.GetByEmail(req.Email);
+
+            if(user != null)
+            {
+                throw new AppException(ErrorStatus.EmailExisted);
+            }
+            user = new User()
+            {
+                Email = req.Email,
+                Password = BCrypt.Net.BCrypt.HashPassword(req.Password),
+                RoleId = req.RoleId,
+            };
+            await _unitOfWork.Users.AddAsync(user);
+            await _unitOfWork.SaveChangesAsync();
+            return _mapper.Map<UserResponse>(user);
+        }
+        public async Task<UserResponse> Update(UserRequest req)
+        {
+            var user = await _unitOfWork.Users.GetByEmail(req.Email);
+
+            if(user == null)
+            {
+                throw new AppException(ErrorStatus.AccountNotFound);
+            }
+
+            user = new User()
+            {
+                Id = req.Id != null ? req.Id.Value : throw new AppException(ErrorStatus.BadRequest),
+                Email = req.Email,
+                RoleId = req.RoleId,
+            };
+            _unitOfWork.Users.UpdateAsync(user);
+            await _unitOfWork.SaveChangesAsync();
+            return _mapper.Map<UserResponse>(user);
+        }
+        public async Task Delete(int id)
+        {
+            var user = await _unitOfWork.Users.GetByIdAsync(id);
+
+            if (user != null)
+            {
+                _unitOfWork.Users.DeleteAsync(user);
+                await _unitOfWork.SaveChangesAsync();
+            }
+        }
+
+        public async Task ChangePassword(ChangePasswordRequest req)
+        {
+            var user = await _unitOfWork.Users.GetByIdAsync(req.userId);
+
+            if (user == null)
+            {
+                throw new AppException(ErrorStatus.BadRequest);
+            }
+            if (user.Password.Equals(req.OldPassword))
+            {
+                throw new AppException(ErrorStatus.OldPasswordInCorrect);
+            }
+            var hashPassword = BCrypt.Net.BCrypt.HashPassword(req.Password);
+            user.Password = hashPassword;
+            _unitOfWork.Users.UpdateAsync(user);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

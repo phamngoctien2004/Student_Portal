@@ -16,10 +16,14 @@ namespace Application.DTOs.Common
 
 		public static BaseResponseDTO<T> SuccessResponse(T data, MetaDataDTO? meta = null, string? message = null, int code = 200)
 			=> new() { Data = data, MetaData = meta, Message = message, Code = code, Success = true };
-
-		public static BaseResponseDTO<T> FailResponse(string message, int code = 500)
+        public static BaseResponseDTO<T> SuccessResponse(T data,  string? message = null, int code = 200)
+            => new() { Data = data, MetaData = null, Message = message, Code = code, Success = true };
+        public static BaseResponseDTO<T> FailResponse(string message, int code = 500)
 			=> new() { Message = message, Code = code, Success = false };
-  
+
+        // success response
+
+
     }
 
 	public class MetaDataDTO
@@ -30,4 +34,11 @@ namespace Application.DTOs.Common
 
 		public int TotalPage => PageSize <= 0 ? 0 : (int)Math.Ceiling((double)Total / PageSize);
 	}
+	public class  Message
+	{
+        public static string GetSuccess(string name, string method)
+        {
+            return $"{method} {name} successfully";
+        }
+    }
 }

@@ -1,20 +1,11 @@
-﻿using Application.DTOs.Request.User;
-using Application.DTOs.Response.User;
-using Application.IRepository;
+﻿using Application.DTOs.User;
 using Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.IServices
 {
-    public interface IUserService
+    public interface IUserService : IBaseService<User, UserRequest,UserResponse, UserParams>
     {
-        Task<User> GetByEmail(string email);
-        Task<User> AddUser(User user);
-        Task<User> AddUser(AddUserReq userRequest);
-
+        Task<User?> GetEntityByEmail(string email);
+        Task ChangePassword(ChangePasswordRequest req);
     }
 }

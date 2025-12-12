@@ -1,4 +1,5 @@
-﻿using Api.Extentions;
+﻿using Amazon.S3;
+using Api.Extentions;
 using Api.Middlewares;
 using Application.IRepository;
 using Application.IServices;
@@ -11,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Đọc cấu hình từ appsettings.json
@@ -27,36 +29,55 @@ Log.Logger = new LoggerConfiguration()
 // Gắn Serilog vào host
 builder.Host.UseSerilog();
 
+// cấu hình kết nối db
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Services.AddInfrastructure(connectionString);
 
-// Dependency Injection
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddScoped<IUploadService, UploadService>();
-
-
-builder.Services.AddAutoMapper(cfg =>
+// cấu hình minio
+builder.Services.AddSingleton<IAmazonS3>(sp =>
 {
-	cfg.AddProfile<ProductMapper>();
-    cfg.AddProfile<CategoryMapper>();
-    cfg.AddProfile<UserMapper>();
+    var config = new AmazonS3Config
+    {
+        ServiceURL = builder.Configuration["AWS:ServiceURL"],
+        ForcePathStyle = true, 
+    };
 
-}); 
+    return new AmazonS3Client(
+        builder.Configuration["AWS:AccessKey"],
+        builder.Configuration["AWS:SecretKey"],
+        config
+    );
+});
+
+
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerConfig();
 builder.Services.AddApiVersioning(options =>
 {
-    options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0); // Mặc định là v1.0
-    options.AssumeDefaultVersionWhenUnspecified = true; // Nếu client không gửi version, tự hiểu là v1
-    options.ReportApiVersions = true; // Trả về header cho biết API hỗ trợ version nào
+    options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+});
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
+builder.Services.AddHttpContextAccessor();
+
+//Cors
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()       // <== Cho phép OPTIONS, GET, POST...
+                  .AllowCredentials();    // Nếu bạn dùng cookie/token
+        });
 });
 AppSettings.Initialize(builder.Configuration);
 
@@ -77,7 +98,7 @@ app.UseSerilogRequestLogging();
 	app.UseSwaggerUI();
 //}
 app.UseExceptionHandler();
-
+app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

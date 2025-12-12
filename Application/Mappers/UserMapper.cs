@@ -1,6 +1,4 @@
-﻿using Application.DTOs.Request.Auth;
-using Application.DTOs.Request.User;
-using Application.DTOs.Response.User;
+﻿using Application.DTOs.User;
 using AutoMapper;
 using Core.Entities;
 using System;
@@ -16,8 +14,7 @@ namespace Application.Mappers
         public UserMapper()
         {
             CreateMap<User, UserResponse>();
-            CreateMap<AddUserReq, User>();
-            CreateMap<RegisterRequest, User>();
+            CreateMap<UserRequest, User>();
         }
     }
 }

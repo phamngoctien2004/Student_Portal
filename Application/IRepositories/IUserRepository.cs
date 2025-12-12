@@ -1,6 +1,7 @@
-﻿using Application.DTOs.Request.Product;
+﻿using Application.DTOs.User;
 using Core.Entities;
 using Domain.Entities;
+using Infrastructure.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +10,8 @@ using System.Threading.Tasks;
 
 namespace Application.IRepository
 {
-	public interface IUserRepository
+	public interface IUserRepository : IBaseRepository<User, UserParams>
     {
-		Task<User?> GetByIdAsync(int id);
 		Task<User?> GetByEmail(string email);
-		Task<List<User>> GetAllAsync();
-        //Task<(List<User> , int)> GetAllAsync(ProductParams param);
-        Task<User> AddAsync(User product);
-		Task<User> SaveChange(User product);
-		Task DeleteAsync(int id);
     }
 }

@@ -9,6 +9,6 @@ namespace Application.IServices.ExternalServices
 {
 	public interface IService1
 	{
-		Task<List<Product>> GetAllProducts();
+		Task<List<Course>> GetAllProducts();
 	}
 }

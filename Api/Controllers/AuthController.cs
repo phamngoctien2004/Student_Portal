@@ -1,6 +1,5 @@
-﻿using Application.DTOs.Common;
-using Application.DTOs.Request.Auth;
-using Application.DTOs.Response.Auth;
+﻿using Application.DTOs.Auth;
+using Application.DTOs.Common;
 using Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,14 +20,18 @@ namespace Api.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
             var authResponse = await _authService.Login(loginRequest);
-            return Ok(BaseResponseDTO<AuthResponse>.SuccessResponse(authResponse, null, "Login successfully"));
-        }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest)
-        {
-            var authResponse = await _authService.Register(registerRequest);
-            return Ok(BaseResponseDTO<AuthResponse>.SuccessResponse(authResponse, null, "Register successfully"));
+            // lưu httponly cookie
+            Response.Cookies.Append("refresh_token", authResponse.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(39)
+            });
+            authResponse.RefreshToken = string.Empty;
+
+            return Ok(BaseResponseDTO<AuthResponse>.SuccessResponse(authResponse, null, "Login successfully"));
         }
     }
 }

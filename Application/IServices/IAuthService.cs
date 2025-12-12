@@ -1,5 +1,4 @@
-﻿using Application.DTOs.Request.Auth;
-using Application.DTOs.Response.Auth;
+﻿using Application.DTOs.Auth;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +10,5 @@ namespace Application.IServices
     public interface IAuthService
     {
         Task<AuthResponse> Login(LoginRequest loginRequest);
-        Task<AuthResponse> Register(RegisterRequest registerRequest);
     }
 }

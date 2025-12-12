@@ -1,12 +1,9 @@
-﻿using Application.IRepository;
+﻿using Application.DTOs.User;
+using Application.IRepository;
 using Core.Entities;
 using Infrastructure.Persistence;
+using Infrastructure.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
@@ -17,21 +14,40 @@ namespace Infrastructure.Repositories
         {
             _context = context;
         }
-        public async Task<User> AddAsync(User user)
+        public async Task AddAsync(User user)
         {
             await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-            return user;
+        }
+        public void UpdateAsync(User user)
+        {
+            _context.Users.Update(user);
+        }
+        public void DeleteAsync(User user)
+        {
+            _context.Users.Remove(user);
         }
 
-        public Task DeleteAsync(int id)
+        public async Task<(List<User>, int)> GetAllAsync(UserParams userParams)
         {
-            throw new NotImplementedException();
-        }
+            var query = _context.Users.AsQueryable();
+            
+            // Filter and Sort
+            if(userParams.Keyword != null)
+            {
+                query = query.Where(x => x.Email.Contains(userParams.Keyword));
+            }
+            if(userParams.RoleId != null)
+            {
+                query = query.Where(x => x.RoleId.Equals(userParams.RoleId.Value));
+            }
+            query = query.Sort(userParams.SortColumn, userParams.SortDirection);
 
-        public Task<List<User>> GetAllAsync()
-        {
-            throw new NotImplementedException();
+            // Paging
+            var count = await query.CountAsync();
+            var users = await query.Skip((userParams.Page - 1) * userParams.PageSize)
+                                   .Take(userParams.PageSize)
+                                   .ToListAsync();
+            return (users, count);
         }
 
         public async Task<User?> GetByEmail(string email)
@@ -42,14 +58,13 @@ namespace Infrastructure.Repositories
             return user;
         }
 
-        public Task<User?> GetByIdAsync(int id)
+        public async Task<User?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var user = await _context.Users
+                .FindAsync(id);
+            return user;
         }
 
-        public Task<User> SaveChange(User product)
-        {
-            throw new NotImplementedException();
-        }
+  
     }
 }
