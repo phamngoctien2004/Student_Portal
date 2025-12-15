@@ -28,5 +28,11 @@ namespace Api.Controllers
             var response = await _service.GetById(id);
             return Ok(BaseResponseDTO<MajorResponse>.SuccessResponse(response!, Message.GetSuccess("Major", "Get")));
         }
+        [HttpGet("{id}/cohorts")]
+        public async Task<IActionResult> GetDetailWithCohorts(int id)
+        {
+            var response = await _service.GetByIdWithCohorts(id);
+            return Ok(BaseResponseDTO<MajorResponse>.SuccessResponse(response!, Message.GetSuccess("Major", "Get")));
+        }
     }
 }

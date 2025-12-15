@@ -10,5 +10,6 @@ namespace Application.IServices
 {
     public interface IMajorService : IBaseService<Major, MajorRequest, MajorResponse, MajorParam>
     {
+        Task<MajorResponse> GetByIdWithCohorts(int majorId);
     }
 }

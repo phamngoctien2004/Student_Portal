@@ -11,6 +11,6 @@ namespace Application.IRepositories
 {
     public interface IMajorRepository : IBaseRepository<Major, MajorParam>
     {
-        
+        Task<Major?> GetByIdWithCohorts(int majorId); 
     }
 }

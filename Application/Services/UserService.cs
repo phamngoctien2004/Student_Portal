@@ -8,7 +8,7 @@ using Application.Mappers;
 using AutoMapper;
 using BCrypt.Net;
 using Core.Entities;
-using Core.Enums;
+using Domain.Constants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,7 +64,7 @@ namespace Application.Services
 
             if(user != null)
             {
-                throw new AppException(ErrorStatus.EmailExisted);
+                throw new AppException(Errors.EmailExisted);
             }
             user = new User()
             {
@@ -82,12 +82,12 @@ namespace Application.Services
 
             if(user == null)
             {
-                throw new AppException(ErrorStatus.AccountNotFound);
+                throw new AppException(Errors.AccountNotFound);
             }
 
             user = new User()
             {
-                Id = req.Id != null ? req.Id.Value : throw new AppException(ErrorStatus.BadRequest),
+                Id = req.Id != null ? req.Id.Value : throw new AppException(Errors.BadRequest),
                 Email = req.Email,
                 RoleId = req.RoleId,
             };
@@ -112,11 +112,11 @@ namespace Application.Services
 
             if (user == null)
             {
-                throw new AppException(ErrorStatus.BadRequest);
+                throw new AppException(Errors.BadRequest);
             }
             if (user.Password.Equals(req.OldPassword))
             {
-                throw new AppException(ErrorStatus.OldPasswordInCorrect);
+                throw new AppException(Errors.OldPasswordInCorrect);
             }
             var hashPassword = BCrypt.Net.BCrypt.HashPassword(req.Password);
             user.Password = hashPassword;

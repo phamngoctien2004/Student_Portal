@@ -50,6 +50,11 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
 
+        public async Task<Major?> GetByIdWithCohorts(int majorId)
+        {
+            return await _context.Majors.Include(m => m.Cohorts)
+                            .FirstOrDefaultAsync(m => m.Id == majorId);        }
+
         public void UpdateAsync(Major entity)
         {
             throw new NotImplementedException();

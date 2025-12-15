@@ -36,6 +36,12 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
+        public async Task<List<FacultyResponse>> GetAll()
+        {
+            var list = await _unitOfWork.Faculties.GetAll();
+            return _mapper.Map<List<FacultyResponse>>(list);
+        }
+
         public async Task<FacultyResponse?> GetById(int id)
         {
             var faculty = await _unitOfWork.Faculties.GetByIdAsync(id);

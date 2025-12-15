@@ -50,6 +50,12 @@ namespace Application.Services
             return _mapper.Map<MajorResponse>(major);
         }
 
+        public async Task<MajorResponse> GetByIdWithCohorts(int majorId)
+        {
+            var major = await _unitOfWork.Majors.GetByIdWithCohorts(majorId);
+            return _mapper.Map<MajorResponse>(major);
+        }
+
         public Task<MajorResponse> Update(MajorRequest req)
         {
             throw new NotImplementedException();

@@ -8,5 +8,7 @@ namespace Application.IServices
         Task<List<EnrollmentResponse>> GetAllByStudent(ScheduleRequest req);
         Task UpdateScore(UpdateScoreRequest req);
         Task UpdateStatus(UpdateStatusRequest req);
+
+        Task<List<int>> GetCoursePassed(int userId);
     }
 }

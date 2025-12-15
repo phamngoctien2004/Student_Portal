@@ -1,17 +1,19 @@
 ﻿using Application.DTOs.Common;
 
 using Application.DTOs.Student;
+using Application.DTOs.Upload;
 using Application.IServices;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Api.Controllers
 {
     [ApiController]
     [Route("api/v{version:apiVersion}/students")]
     [ApiVersion("1.0")]
-    //[Authorize]
+    [Authorize]
     public class StudentController : BaseController
     {
         private readonly IStudentService _studentService;
@@ -57,11 +59,23 @@ namespace Api.Controllers
             return NoContent();
         }
 
-        [HttpPut("avatar")]
-        public async Task<IActionResult> UploadAvatar([FromForm] IFormFile formFile)
+        [HttpPost("avatar")]
+        public async Task<IActionResult> UploadAvatar([FromForm] IFormFile file)
         {
-
-            return NoContent();
+            if (file != null)
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var uploadReq = new UploadReq()
+                {
+                    FileName = file.FileName,
+                    ContentType = file.ContentType,
+                    FileStream = file.OpenReadStream(),
+                    Length = file.Length
+                };
+                var url = await _studentService.UploadAvatar(uploadReq, int.Parse(userId));
+                return Ok(BaseResponseDTO<string>.SuccessResponse(url, "Upload Avatar successfully"));
+            }
+            return BadRequest();
         }
     }
 }

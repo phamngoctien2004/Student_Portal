@@ -7,7 +7,7 @@ using Application.Helpers;
 using Application.IRepositories;
 using Application.IServices;
 using AutoMapper;
-using Core.Enums;
+using Domain.Constants;
 using Domain.Entities;
 using Microsoft.Extensions.Logging;
 namespace Application.Services
@@ -40,20 +40,20 @@ namespace Application.Services
             if(teacher == null)
             {
                 _logger.LogDebug($"===Course Section Service: Teacher Invalid===");
-                throw new AppException(ErrorStatus.BadRequest);
+                throw new AppException(Errors.BadRequest);
             }
 
             var course = await _courseService.GetById(req.CourseId);
             if (course == null)
             {
                 _logger.LogDebug($"===Course Section Service: Course Invalid===");
-                throw new AppException(ErrorStatus.BadRequest);
+                throw new AppException(Errors.BadRequest);
             }
             var semester = await _unitOfWork.Semesters.GetByIdAsync(req.SemesterId);
             if (semester == null)
             {
                 _logger.LogDebug($"===Course Section Service: Course Invalid===");
-                throw new AppException(ErrorStatus.BadRequest);
+                throw new AppException(Errors.BadRequest);
             }
             // tạo code 
             string datePart = DateTime.Now.ToString("ddMMyy");
@@ -132,28 +132,28 @@ namespace Application.Services
 
             if(courseSection == null)
             {
-                throw new AppException(ErrorStatus.BadRequest);
+                throw new AppException(Errors.BadRequest);
             }
 
             var semester = await _unitOfWork.Semesters.GetByIdAsync(req.SemesterId);
             if (semester == null)
             {
                 _logger.LogDebug($"===Course Section Service: Course Invalid===");
-                throw new AppException(ErrorStatus.BadRequest);
+                throw new AppException(Errors.BadRequest);
             }
 
             var teacher = await _teacherService.GetById(req.TeacherId);
             if (teacher == null)
             {
                 _logger.LogDebug($"===Course Section Service: Teacher Invalid===");
-                throw new AppException(ErrorStatus.BadRequest);
+                throw new AppException(Errors.BadRequest);
             }
 
             var course = await _courseService.GetById(req.CourseId);
             if (course == null)
             {
                 _logger.LogDebug($"===Course Section Service: Course Invalid===");
-                throw new AppException(ErrorStatus.BadRequest);
+                throw new AppException(Errors.BadRequest);
             }
 
             courseSection.TeacherId = req.TeacherId;

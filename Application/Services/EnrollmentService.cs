@@ -1,11 +1,11 @@
 ﻿using Application.DTOs.Common;
 using Application.DTOs.Enrollment;
+using Application.Exceptions;
 using Application.IRepositories;
 using Application.IServices;
-using Application.Exceptions;
-using Core.Enums;
-using Domain.Entities;
 using AutoMapper;
+using Domain.Constants;
+using Domain.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services
@@ -16,12 +16,18 @@ namespace Application.Services
         private readonly ICourseSectionService _courseSectionService;
         private readonly IMapper _mapper;
         private readonly ILogger<IEnrollmentService> _logger;
-        public EnrollmentService(IUnitOfWork unitOfWork, ICourseSectionService courseSectionService, IMapper mapper, ILogger<IEnrollmentService> logger)
+        private readonly IMeService _meService;
+        public EnrollmentService(IUnitOfWork unitOfWork, 
+            ICourseSectionService courseSectionService, 
+            IMapper mapper, 
+            ILogger<IEnrollmentService> logger,
+            IMeService meService)
         {
             _unitOfWork = unitOfWork;
             _courseSectionService = courseSectionService;
             _mapper = mapper;
             _logger = logger;
+            _meService = meService;
         }
 
         public async Task<EnrollmentResponse> Add(EnrollmentRequest req)
@@ -34,16 +40,16 @@ namespace Application.Services
 
             if(courseSection == null)
             {
-                throw new AppException(ErrorStatus.DataNotFound);
+                throw new AppException(Errors.DataNotFound);
             }
 
             var isExisted = await _unitOfWork.Enrollments.ExistByCourseAndStudentAsync(courseSection.Course.Id, req.StudentId);
             if(isExisted)
             {
-                throw new AppException(ErrorStatus.CannotRegisterCourse);
+                throw new AppException(Errors.CannotRegisterCourse);
             }
 
-            var semester = courseSection.Semester ?? throw new AppException(ErrorStatus.InternalServer);
+            var semester = courseSection.Semester ?? throw new AppException(Errors.InternalServer);
             isExisted = await _unitOfWork.Enrollments
                 .ExistBySemesterAndDayAndSlotAsync(semester.Id,
                                                             (int) courseSection.Slot,
@@ -51,7 +57,7 @@ namespace Application.Services
                                                             req.StudentId);
             if (isExisted)
             {
-                throw new AppException(ErrorStatus.ScheduleInvalid);
+                throw new AppException(Errors.ScheduleInvalid);
             }
             _logger.LogInformation("Enroll: Request Valid");
 
@@ -78,14 +84,14 @@ namespace Application.Services
 
             if (enrollment == null)
             {
-                throw new AppException(ErrorStatus.BadRequest);
+                throw new AppException(Errors.BadRequest);
             }
 
             var canDelete = enrollment.CourseSection!.Semester!.IsJoin;
 
             if (!canDelete)
             {
-                throw new AppException(ErrorStatus.CannotCancel);
+                throw new AppException(Errors.CannotCancel);
             }
 
             _unitOfWork.Enrollments.DeleteAsync(enrollment);
@@ -108,6 +114,11 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
+        public async Task<List<int>> GetCoursePassed(int studentId)
+        {
+            return await _unitOfWork.Enrollments.GetEnrollmentPassed(studentId);
+        }
+
         public async Task<EnrollmentResponse> Update(EnrollmentRequest req)
         {
             throw new NotImplementedException();
@@ -119,7 +130,7 @@ namespace Application.Services
 
             if (enrollment == null)
             {
-                throw new AppException(ErrorStatus.BadRequest);
+                throw new AppException(Errors.BadRequest);
             }
 
             enrollment.Attendance = req.Attendance;
@@ -136,7 +147,7 @@ namespace Application.Services
 
             if (enrollment == null)
             {
-                throw new AppException(ErrorStatus.BadRequest);
+                throw new AppException(Errors.BadRequest);
             }
             enrollment.Status = req.Status;
 

@@ -18,8 +18,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Đọc cấu hình từ appsettings.json
 Log.Logger = new LoggerConfiguration()
 	.ReadFrom.Configuration(builder.Configuration)
-    .WriteTo.Console()
-	.WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
     .MinimumLevel.Information()
 	.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)

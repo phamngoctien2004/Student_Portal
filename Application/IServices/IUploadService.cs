@@ -1,11 +1,6 @@
 ﻿using Application.DTOs.Upload;
 using Application.Exceptions;
-using Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Domain.Constants;
 
 namespace Application.IServices
 {
@@ -16,19 +11,19 @@ namespace Application.IServices
         {
             if (file == null || file.FileStream == null)
             {
-                throw new AppException(ErrorStatus.FileNotEmpty);
+                throw new AppException(Errors.FileNotEmpty);
             }
 
             var maxBytes = UploadReq.MaxSize * 1024 * 1024; // 10mb
             if (file.Length > maxBytes)
             {
-                throw new AppException(ErrorStatus.FileTooLarge);
+                throw new AppException(Errors.FileTooLarge);
             }
 
             var ext = Path.GetExtension(file.FileName).ToLower();
             if (!UploadReq.AllowedExtension.Contains(ext))
             {
-                throw new AppException(ErrorStatus.FileNotAllowed);
+                throw new AppException(Errors.FileNotAllowed);
             }
             var fileName = $"{Guid.NewGuid()}{ext}";
             return fileName;

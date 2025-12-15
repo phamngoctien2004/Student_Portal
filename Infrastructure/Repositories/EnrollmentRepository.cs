@@ -73,5 +73,14 @@ namespace Infrastructure.Repositories
         {
             _context.Enrollments.Update(entity);
         }
+
+        public async Task<List<int>> GetEnrollmentPassed(int studentId)
+        {
+            return await _context.Enrollments
+                .Where(e => e.StudentId == studentId && e.IsPass == true)
+                .Select(e => e.CourseSection.Course.Id)
+                .Distinct()
+                .ToListAsync();
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Course;
+﻿using Application.DTOs.Corhot;
+using Application.DTOs.Course;
 using System.Text.Json.Serialization;
 
 namespace Application.DTOs.Major
@@ -11,5 +12,8 @@ namespace Application.DTOs.Major
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<CourseResponse>? Courses { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<CohortResponse>? Cohorts{ get; set; }
     }
 }

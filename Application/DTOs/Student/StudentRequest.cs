@@ -16,5 +16,7 @@ namespace Application.DTOs.Student
         public string Address { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public int CohortId { get; set; }
+
+        public string Email { get; set; } = string.Empty;
     }
 }

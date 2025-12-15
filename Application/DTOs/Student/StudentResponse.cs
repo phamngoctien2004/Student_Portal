@@ -11,7 +11,7 @@ namespace Application.DTOs.Student
 {
     public class StudentResponse
     {
-        public int? Id { get; set; }
+        public int Id { get; set; }
         public string? Code { get; set; }
         public string? Name { get; set; }
         public Gender Gender { get; set; }
@@ -19,6 +19,8 @@ namespace Application.DTOs.Student
         public string? Address { get; set; }
         public string? Phone { get; set; }
         public string? Avatar { get; set; }
+        public string? Email { get; set; }
+        public string? Image {  get; set; }
         public CohortResponse? Cohort { get; set; }
     }
 }

@@ -11,5 +11,6 @@ namespace Application.IRepositories
 {
     public interface IFacultyRepository : IBaseRepository<Faculty, FacultyParam>
     {
+        Task<List<Faculty>> GetAll();
     }
 }

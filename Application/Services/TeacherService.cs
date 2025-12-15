@@ -6,7 +6,7 @@ using Application.IRepositories;
 using Application.IServices;
 using AutoMapper;
 using Core.Entities;
-using Core.Enums;
+using Domain.Constants;
 using Domain.Entities;
 using Domain.Enums;
 using System;
@@ -37,7 +37,7 @@ namespace Application.Services
 
             if (existsTeacher)
             {
-                throw new AppException(ErrorStatus.TeacherExisted);
+                throw new AppException(Errors.TeacherExisted);
             }
 
             // create teacher account 
@@ -75,18 +75,18 @@ namespace Application.Services
         {
             if(req.Id == null)
             {
-                throw new AppException(ErrorStatus.INVALID_DATA);
+                throw new AppException(Errors.InvalidData);
             }
 
             var teacher = await _unitOfWork.Teachers.GetByIdAsync(req.Id.Value);
             if (teacher == null)
             {
-                throw new AppException(ErrorStatus.TeacherNotFound);
+                throw new AppException(Errors.TeacherNotFound);
             }
 
             if (!teacher.Phone.Equals(req.Phone) && await _unitOfWork.Teachers.ExistsByPhone(req.Phone))
             {
-                throw new AppException(ErrorStatus.PHONE_EXISTED);
+                throw new AppException(Errors.PhoneExisted);
             } 
 
             teacher.Name = req.Name;
@@ -131,7 +131,7 @@ namespace Application.Services
 
             if (teacher == null)
             {
-                throw new AppException(ErrorStatus.TeacherNotFound);
+                throw new AppException(Errors.TeacherNotFound);
             }
 
             var user = teacher.User;

@@ -7,7 +7,7 @@ using Application.IServices;
 using Application.IServices.ExternalServices;
 using Application.Mappers;
 using AutoMapper;
-using Core.Enums;
+using Domain.Constants;
 using Domain.Entities;
 using Microsoft.Extensions.Logging;
 using static Domain.Constants.MessageConstant;
@@ -90,11 +90,11 @@ namespace Application.Services
         {
             
             var course = await _repository.GetByIdAsync(req.Id 
-                ?? throw new AppException(ErrorStatus.BadRequest));
+                ?? throw new AppException(Errors.BadRequest));
 
             if(course == null)
             {
-                throw new AppException(ErrorStatus.DataNotFound);
+                throw new AppException(Errors.DataNotFound);
             }
 
             course.Name = req.Name;
@@ -112,11 +112,11 @@ namespace Application.Services
 
             if (course == null)
             {
-                throw new AppException(ErrorStatus.DataNotFound);
+                throw new AppException(Errors.DataNotFound);
             }
             if (course.CourseSections.Any())
             {
-                throw new AppException(ErrorStatus.CannotDeleteHasChild);
+                throw new AppException(Errors.CannotDeleteHasChild);
             }
 
             _repository.DeleteAsync(course);

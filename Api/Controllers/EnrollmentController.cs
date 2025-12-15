@@ -4,6 +4,7 @@ using Application.IServices;
 using Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Api.Controllers
 {
@@ -13,13 +14,13 @@ namespace Api.Controllers
     [Authorize]
     public class EnrollmentController : BaseController
     {
-        private readonly IMeService _meService;
+        private readonly IStudentService _studentService;
         private readonly IEnrollmentService _service;
 
-        public EnrollmentController(IEnrollmentService service, IMeService meService)
+        public EnrollmentController(IEnrollmentService service, IStudentService studentService)
         {
             _service = service;
-            _meService = meService;
+            _studentService = studentService;
         }
         
         [HttpGet("schedules")]
@@ -28,6 +29,15 @@ namespace Api.Controllers
         {
             var result = await _service.GetAllByStudent(req);
             return Ok(BaseResponseDTO<List<EnrollmentResponse>>.SuccessResponse(result, Message.GetSuccess("Enroll", "Get")));
+        }
+        [HttpGet("me")]
+        public async Task<IActionResult> GetEnrollmentPass()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var student = await _studentService.GetByUserId(int.Parse(userId));
+            var result = await _service.GetCoursePassed(student.Id);
+            return Ok(BaseResponseDTO<List<int>>.SuccessResponse(result, Message.GetSuccess("Passed Course", "Get")));
         }
         [HttpPost]
         [AllowAnonymous]

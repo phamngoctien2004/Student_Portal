@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Application.DTOs.Corhot;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,5 +14,6 @@ namespace Application.DTOs.Faculty
         public string? Name { get; set; }
         public string? Address { get; set; } = string.Empty;
         public string? Phone { get; set; } = string.Empty;
+
     }
 }

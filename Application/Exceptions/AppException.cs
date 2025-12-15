@@ -1,5 +1,5 @@
-﻿using Core.Enums;
-using Core.Extensions;
+﻿
+using Domain.Constants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +10,10 @@ namespace Application.Exceptions
 {
     public class AppException : Exception
     {
-        public ErrorStatus ErrorStatus { get; }
+        public ErrorCode ErrorCode { get; }
         
-        public AppException(ErrorStatus errorStatus) : base(errorStatus.ToString()) { 
-            ErrorStatus = errorStatus;
+        public AppException(ErrorCode errorCode) : base(errorCode.Message) {
+            ErrorCode = errorCode;
         }
     }
 }

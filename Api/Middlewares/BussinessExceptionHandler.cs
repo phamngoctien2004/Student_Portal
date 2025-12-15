@@ -1,7 +1,5 @@
 ﻿using Application.DTOs.Common;
 using Application.Exceptions;
-using AutoMapper;
-using Core.Extensions;
 using Microsoft.AspNetCore.Diagnostics;
 
 namespace Api.Middlewares
@@ -23,10 +21,11 @@ namespace Api.Middlewares
             // Xử lý lỗi bussiness
             if(exception is AppException appExp)
             {
-                var (message, status) = appExp.ErrorStatus.GetDetail();
-                response = BaseResponseDTO<string>.FailResponse(message, (int) appExp.ErrorStatus);
-                statusCode = (int) status;
-                _logger.LogWarning("Business Error: {Code} - {Message}", appExp.ErrorStatus, message);
+                var errorCode = appExp.ErrorCode;
+                statusCode = errorCode.HttpStatus;
+                response = BaseResponseDTO<string>.FailResponse(errorCode.Message, errorCode.HttpStatus);
+                _logger.LogWarning("Business Error: {Code} - {Message}", errorCode.Code, errorCode.Message);
+
             }
             else
             {

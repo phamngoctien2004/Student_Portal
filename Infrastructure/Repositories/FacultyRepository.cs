@@ -2,6 +2,7 @@
 using Application.IRepositories;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
@@ -21,6 +22,11 @@ namespace Infrastructure.Repositories
         public void DeleteAsync(Faculty entity)
         {
             context.Faculties.Remove(entity);
+        }
+
+        public async Task<List<Faculty>> GetAll()
+        {
+            return await context.Faculties.ToListAsync();
         }
 
         public Task<(List<Faculty>, int)> GetAllAsync(FacultyParam param)

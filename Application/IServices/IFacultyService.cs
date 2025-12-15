@@ -10,5 +10,6 @@ namespace Application.IServices
 {
     public interface IFacultyService : IBaseService<Faculty, FacultyRequest, FacultyResponse, FacultyParam>
     {
+        Task<List<FacultyResponse>> GetAll();
     }
 }

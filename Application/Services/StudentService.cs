@@ -1,12 +1,13 @@
 ﻿using Application.DTOs.Common;
 using Application.DTOs.Student;
 using Application.DTOs.Teacher;
+using Application.DTOs.Upload;
 using Application.DTOs.User;
 using Application.Exceptions;
 using Application.IRepositories;
 using Application.IServices;
 using AutoMapper;
-using Core.Enums;
+using Domain.Constants;
 using Domain.Entities;
 
 namespace Application.Services
@@ -16,11 +17,13 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
-        public StudentService(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService)
+        private readonly IUploadService _uploadService;
+        public StudentService(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService, IUploadService uploadService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userService = userService;
+            _uploadService = uploadService;
         }
 
         public async Task<BaseResponseDTO<List<StudentResponse>>> GetAll(StudentParams param)
@@ -72,6 +75,7 @@ namespace Application.Services
                 CohortId = req.CohortId,
                 Code = studentCode,
                 UserId = userResponse.Id,
+                Email = req.Email,
             };
 
             await _unitOfWork.Students.AddAsync(student);
@@ -83,18 +87,19 @@ namespace Application.Services
         {
             // check
             var id = req.Id;
-            if(id == null || id != 0)
+            if(id == null || id == 0)
             {
-                throw new AppException(ErrorStatus.BadRequest);
+                throw new AppException(Errors.BadRequest);
             }
 
             var student = await _unitOfWork.Students.GetByIdAsync(id.Value);
             if(student == null)
             {
-                throw new AppException(ErrorStatus.BadRequest); 
+                throw new AppException(Errors.BadRequest); 
             }
             student.Address = req.Address;
             student.Phone = req.Phone;
+            student.Email = req.Email;
 
             await _unitOfWork.SaveChangesAsync();
             return _mapper.Map<StudentResponse>(student);
@@ -106,7 +111,7 @@ namespace Application.Services
             var student = await _unitOfWork.Students.GetByIdAsync(id);
             if(student == null)
             {
-                throw new AppException(ErrorStatus.StudentNotFound);
+                throw new AppException(Errors.StudentNotFound);
             }
 
             _unitOfWork.Students.DeleteAsync(student);
@@ -123,6 +128,23 @@ namespace Application.Services
         {
             var student = await _unitOfWork.Students.GetByUserId(userId);
             return _mapper.Map<StudentResponse>(student);
+        }
+
+        public async Task<string> UploadAvatar(UploadReq req, int userId)
+        {
+            var url = await _uploadService.Upload(req, "avatar");
+            var student = await _unitOfWork.Students.GetByUserId(userId);
+
+            if (student == null)
+            {
+                throw new AppException(Errors.BadRequest);
+            }
+            student.Image = url;
+
+            _unitOfWork.Students.UpdateAsync(student);
+            await _unitOfWork.SaveChangesAsync();
+
+            return url;
         }
     }
 }

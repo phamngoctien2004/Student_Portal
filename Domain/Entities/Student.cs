@@ -12,6 +12,8 @@ namespace Domain.Entities
         public Cohort? Cohort { get; set; }
         public int UserId { get; set; }
         public User? User { get; set; }
+
+        public string? Image {  get; set; }
         public ICollection<Enrollment> Enrollments { get; set; } = [];
     }
 }
