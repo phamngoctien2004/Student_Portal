@@ -9,6 +9,7 @@ namespace Application.DTOs.CourseSection
 {
     public class CourseSectionParam : BaseQueryDTO
     {
+        public int? SemesterId { get; set; }
         public int? CourseId { get; set; }
         public int? TeacherId { get; set; }
     }

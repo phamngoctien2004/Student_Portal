@@ -55,6 +55,13 @@ namespace Api.Controllers
             await _userService.ChangePassword(req);
             return NoContent();
         }
+
+        [HttpPost("password/reset")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordRequest req)
+        {
+            await _userService.ResetPassword(req);
+            return NoContent();
+        }
         [HttpPost]
         [AllowAnonymous]
 

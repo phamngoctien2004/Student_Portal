@@ -5,9 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace Application.DTOs.Enrollment
 {
-    public class    EnrollmentResponse
+    public class EnrollmentResponse
     {
-        //public int Id { get; set; }
+        public int Id { get; set; }
         //[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         //public StudentResponse? Student { get; set; }
         //[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

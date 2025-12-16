@@ -7,5 +7,7 @@ namespace Application.IServices
     {
         Task<User?> GetEntityByEmail(string email);
         Task ChangePassword(ChangePasswordRequest req);
+
+        Task ResetPassword(ResetPasswordRequest req);
     }
 }

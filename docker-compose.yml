@@ -1,0 +1,15 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=student_portal;User Id=tokuda;Password=hvnh2004;TrustServerCertificate=True;Encrypt=False;
+      - Jwt__SecretKey=DayLaMotChuoiBiMatRatDaiDeDamBaoAnToanTren32KyTu
+      - AWS__ServiceURL=http://minio:9000
+    # Hoặc dùng env_file:
+    # env_file:
+    #   - .env
+    volumes:
+      - ./Logs:/app/Logs

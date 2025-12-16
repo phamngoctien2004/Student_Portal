@@ -36,11 +36,15 @@ namespace Infrastructure.Repositories
             }
             if(param.TeacherId != null)
             {
-                query = query.Where(x => x.TeacherId.Equals(param.TeacherId));
+                query = query.Where(x => x.TeacherId == param.TeacherId);
             }
             if (param.CourseId != null)
             {
-                query = query.Where(x => x.CourseId.Equals(param.CourseId));
+                query = query.Where(x => x.CourseId == param.CourseId);
+            }
+            if (param.SemesterId != null){
+                query = query.Where(x => x.SemesterId == param.SemesterId);
+
             }
 
             var count = await query.CountAsync();

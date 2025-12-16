@@ -114,9 +114,23 @@ namespace Application.Services
             {
                 throw new AppException(Errors.BadRequest);
             }
-            if (user.Password.Equals(req.OldPassword))
+            if (!BCrypt.Net.BCrypt.Verify(req.OldPassword, user.Password))
             {
                 throw new AppException(Errors.OldPasswordInCorrect);
+            }
+            var hashPassword = BCrypt.Net.BCrypt.HashPassword(req.Password);
+            user.Password = hashPassword;
+            _unitOfWork.Users.UpdateAsync(user);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task ResetPassword(ResetPasswordRequest req)
+        {
+            var user = await _unitOfWork.Users.GetByIdAsync(req.UserId);
+
+            if (user == null)
+            {
+                throw new AppException(Errors.BadRequest);
             }
             var hashPassword = BCrypt.Net.BCrypt.HashPassword(req.Password);
             user.Password = hashPassword;
